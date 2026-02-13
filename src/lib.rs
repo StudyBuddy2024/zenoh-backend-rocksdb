@@ -75,6 +75,7 @@ pub const PROP_STORAGE_CREATE_DB: &str = "create_db";
 pub const PROP_STORAGE_READ_ONLY: &str = "read_only";
 pub const PROP_STORAGE_ON_CLOSURE: &str = "on_closure";
 pub const PROP_STORAGE_MAX_LOG_FILE_SIZE: &str = "max_log_file_size";
+pub const PROP_STORAGE_MAX_TOTAL_WAL_SIZE: &str = "max_total_wal_size";
 
 // Special key for None (when the prefix being stripped exactly matches the key)
 pub const NONE_KEY: &str = "@@none_key@@";
@@ -216,6 +217,20 @@ impl Volume for RocksdbVolume {
             ),
         };
         opts.set_max_log_file_size(max_log_file_size as usize);
+
+        let max_total_wal_size: u64 = match volume_cfg.get(PROP_STORAGE_MAX_TOTAL_WAL_SIZE) {
+            Some(serde_json::Value::Number(n)) => n.as_u64()
+                .ok_or_else(|| zerror!(
+                    "Optional property `{}` must be a positive integer (bytes)",
+                    PROP_STORAGE_MAX_TOTAL_WAL_SIZE
+                ))?,
+            None => 0,  // Default: 0 (no limit, RocksDB's default)
+            _ => bail!(
+                "Optional property `{}` of rocksdb storage configurations must be a number",
+                PROP_STORAGE_MAX_TOTAL_WAL_SIZE
+            ),
+        };
+        opts.set_max_total_wal_size(max_total_wal_size as usize);
 
         opts.create_missing_column_families(true);
         let db = if read_only {
