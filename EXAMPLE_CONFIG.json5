@@ -19,7 +19,11 @@
             // the RocksDB database will be stored in this directory (relative to ${ZENOH_BACKEND_ROCKSDB_ROOT})
             dir: "example",
             // create the RocksDB database if not already existing
-            create_db: true
+            create_db: true,
+            // maximum size of the RocksDB log file in bytes (default: 0, which means no limit)
+            max_log_file_size: 10485760,
+            // maximum total size of write-ahead log files in bytes (default: 0, which means no limit)
+            max_total_wal_size: 104857600
           }
         }
       }
