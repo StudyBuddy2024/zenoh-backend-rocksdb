@@ -230,7 +230,7 @@ impl Volume for RocksdbVolume {
                 PROP_STORAGE_MAX_TOTAL_WAL_SIZE
             ),
         };
-        opts.set_max_total_wal_size(max_total_wal_size as usize);
+        opts.set_max_total_wal_size(max_total_wal_size);
 
         opts.create_missing_column_families(true);
         let db = if read_only {
